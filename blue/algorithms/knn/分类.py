@@ -57,6 +57,25 @@ class KNN(object):
 
         return np.asarray(result)
 
+    def predict2(self, X):
+        """权重"""
+        X = np.asarray(X)
+        result = []
+
+        for x in X:
+            # 欧式距离
+            dis = np.sqrt(np.sum((x - self.X) ** 2, axis=1))
+            # 获取排序前的索引
+            index = dis.argsort()
+            # 只取k个近的元素
+            index = index[:self.k]
+            # 统计元素出现次数
+            count = np.bincount(self.y[index], weights=1/dis[index])
+            # 返回最大值索引, 最大值就是出现次数最多
+            result.append(count.argmax())
+
+        return np.asarray(result)
+
 
 # 获取不同类别
 t0 = iris[iris["class"] == 0]
@@ -75,6 +94,8 @@ test_Y = pd.concat([t0.iloc[40:, -1], t1.iloc[40:, -1], t2.iloc[40:, -1]], axis=
 knn = KNN(k=3)
 knn.fit(train_X, train_Y)
 r = knn.predict(test_X)
+r2 = knn.predict2(test_X)
+# print(r2, np.sum(r2 == test_Y))
 # print(test_Y)
 # print(r)
 # print(r == test_Y)
